@@ -15,8 +15,16 @@ h1 {
   margin-left: 5%;
 }
 
-p {
+.intro {
   margin-left: 8%;
+}
+
+.results {
+  margin: 0 auto;
+  text-align: center;
+  border: 1px solid #9c9994;
+  max-width: 68%;
+  font-size: 14px;
 }
 
 .header {
