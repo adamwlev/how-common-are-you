@@ -27,6 +27,15 @@ h1 {
   font-size: 14px;
 }
 
+.genz-cat {
+    min-height: 28px;
+}
+
+.genz {
+    float: right;
+    padding-right: 4px;
+}
+
 .header {
     font-size: 1rem;
     margin-bottom: .5rem;
@@ -52,7 +61,7 @@ h1 {
     padding-top: 3px;
     padding-bottom: 18px;
     padding-left: 11px;
-    border-bottom: 2px dashed black;
+    border-top: 2px dashed black;
 }
 
 .mini-container {

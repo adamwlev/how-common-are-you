@@ -1,10 +1,11 @@
 const D = 290;
 const dens = .25;
 const n = 325719178;
+const n_without = 238771628;
 const max_attempts = 5000;
 const overall_max_attempts = 35;
 const k = 6;
-const n_big_ones = 8;
+const n_big_ones = 1;
 const pct_w_big_ones = .8;
 const buffer = 1.35;
 
@@ -35,44 +36,54 @@ function draw_circles(top_key,indicators,sel_tup){
     const sub = data.get(top_key).get(indicators);
     var svg = d3.select("svg");
     svg.selectAll("circle.temp-circle").remove();
+    svg.selectAll("path.arrow").remove();
     var circles = [];
     var tree = new kdTree([], distance, ["x", "y"]);
     var center_to_radius = {};
     var n_w_big_ones = (1-pct_w_big_ones)*sub.get("n_populated_groups");
+    const n_peeps = ((top_key=="with_z") ? n : n_without);
     var overall_attempts = 0;
     while (overall_attempts<overall_max_attempts){
         var break_out = true;
         for (const [key,value] of sub.get("vals")){
             var is_purple = key==sel_tup;
-            var radius = D/2*Math.pow(dens*value[0]/n,.5);
+            var radius = D/2*Math.pow(dens*value[0]/n_peeps,.5);
             var attempts = 0;
             while (attempts<max_attempts){
-            r = (D/2-radius) * Math.pow(Math.random(),.5);
-            theta = Math.random()*2*Math.PI;
-            x = r*Math.cos(theta);
-            y = r*Math.sin(theta);
-            search_res = tree.nearest({"x":x,"y":y}, k);
-            var points_to_try = [];
-            search_res.forEach(function(res){
-                points_to_try.push([res[0].x,res[0].y,center_to_radius[[res[0].x,res[0].y]]]);
-            });
-            if ((circles.length>n_big_ones) && (circles.length>n_w_big_ones)) {
-                points_to_try.push.apply(points_to_try, circles.slice(0,n_big_ones));
-            }
-            if (!overlaps(points_to_try,[x,y,radius],((sub.get("n_populated_groups") > 100) ? buffer : buffer + 4))){
-                tree.insert({"x":x,"y":y});
-                center_to_radius[[x,y]] = radius;
-                circles.push([x,y,radius]);
-                svg.append("circle")
-                   .attr("class","temp-circle")
-                   .attr("cx", 150+x)
-                   .attr("cy", 150+y)
-                   .attr("r", radius)
-                   .style("fill",((is_purple) ? "#6603fc" : "none"))
-                   .style("stroke", "red");
-                break
-            }
-            attempts += 1;
+                r = (D/2-radius) * Math.pow(Math.random(),.5);
+                theta = Math.random()*2*Math.PI;
+                x = r*Math.cos(theta);
+                y = r*Math.sin(theta);
+                search_res = tree.nearest({"x":x,"y":y}, k);
+                var points_to_try = [];
+                search_res.forEach(function(res){
+                    points_to_try.push([res[0].x,res[0].y,center_to_radius[[res[0].x,res[0].y]]]);
+                });
+                if ((circles.length>n_big_ones) && (circles.length>n_w_big_ones)) {
+                    points_to_try.push.apply(points_to_try, circles.slice(0,n_big_ones));
+                }
+                if (!overlaps(points_to_try,[x,y,radius],((sub.get("n_populated_groups") > 100) ? buffer : buffer + 4))){
+                    tree.insert({"x":x,"y":y});
+                    center_to_radius[[x,y]] = radius;
+                    circles.push([x,y,radius]);
+                    svg.append("circle")
+                       .attr("class","temp-circle")
+                       .attr("cx", 150+x)
+                       .attr("cy", 150+y)
+                       .attr("r", radius)
+                       .style("fill",((is_purple) ? "#6603fc" : "#f77284"))
+                       //.style("stroke", ((is_purple) ? "none" : "red"));
+                    if ((is_purple) && (radius<1.5)){
+                        svg.append('path')
+                            .style("fill","none")
+                            .attr("class","arrow")
+                            .attr("marker-end","url(#triangle)")
+                            .attr("stroke","black")
+                            .attr("d",get_path(x,y,radius));
+                    }
+                    break
+                }
+                attempts += 1;
             }
             if ((attempts==max_attempts) && ((is_purple) || sub.get("n_populated_groups")<30)){
                 break_out = false;
@@ -136,9 +147,19 @@ function draw_first_circle(){
         .attr("cx", 150)
         .attr("cy", 150)
         .attr("r", 140)
-        .style("stroke", "red")
         .style("fill", "#6603fc");
-    $(".results").html("No selection has been made yet so the circle represents all <b>" + format_big_number(n) + "</b> people in the dataset.");
+    $(".results").html("No selection has been made yet so the circle represents all <b>" + format_big_number((($("#include_genz").prop("checked")) ? n : n_without)) + "</b> people in the dataset.");
+    svg.append("svg:defs").append("svg:marker")
+        .attr("id", "triangle")
+        .attr("refX", 6)
+        .attr("refY", 6)
+        .attr("markerWidth", 12)
+        .attr("markerHeight", 12)
+        .attr("markerUnits","strokeWidth")
+        .attr("orient", "auto")
+        .append("path")
+        .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
+        .style("fill", "black");
 };
 
 function put_clear_listeners(){
@@ -153,6 +174,44 @@ function put_radio_listeners(){
         update_circles();
     });
 };
+
+function put_genz_listeners(){
+    $('#include_genz').on('change',function(){
+        if (!$(this).prop("checked")){
+            $("#genz").prop("checked",false);
+        }
+        $("#genz").prop('disabled',!$(this).prop("checked"));
+        update_circles();
+    });
+};
+
+function get_path(x,y,radius){
+    const slack = 6;
+    var x = 150+x;
+    var y = 150+y;
+    var dxs = Math.pow(150-x,2);
+    var dys = Math.pow(150-y,2);
+    var den = Math.pow(dxs+dys,.5);
+    var cx = 150 + 155*(x-150)/den;
+    var cy = 150 + 155*(y-150)/den;
+    var slope = (cy-y)/(cx-x);
+    var xs = 1/(1+Math.abs(slope));
+    var ys = 1-xs;
+    if (cx>150){
+        dx = (radius + slack)*xs;
+    }
+    else {
+        dx = (-radius - slack)*xs;
+    }
+    if (cy>150){
+        dy = (radius + slack)*ys;
+    }
+    else {
+        dy = (-radius - slack)*ys;
+    }
+    var path = "M" + cx + "," + cy + " L"+(x+dx)+","+(y+dy);
+    return path;
+}
 
 function format_big_number(n){
     const str_n = "" + n;
@@ -188,8 +247,8 @@ function update_circles(){
     indicators = indicators.slice(0, -1);
     sel_tup = sel_tup.slice(0, -1);
     if (sel_tup.length>0){
-        draw_circles("with_z",indicators,sel_tup);
-        update_text_results("with_z",indicators,sel_tup);
+        draw_circles((($("#include_genz").prop("checked")) ? "with_z" : "without_z"),indicators,sel_tup);
+        update_text_results((($("#include_genz").prop("checked")) ? "with_z" : "without_z"),indicators,sel_tup);
     }
     else {
         draw_first_circle();
@@ -200,6 +259,7 @@ function update_circles(){
 function init(){
     put_clear_listeners();
     put_radio_listeners();
+    put_genz_listeners();
     update_circles();
 };
 
