@@ -88,6 +88,7 @@ function draw_circles(top_key,indicators,sel_tup){
             if ((attempts==max_attempts) && ((is_purple) || sub.get("n_populated_groups")<30)){
                 break_out = false;
                 svg.selectAll("circle.temp-circle").remove();
+                svg.selectAll("path.arrow").remove();
                 circles = [];
                 center_to_radius = [];
                 tree = new kdTree([], distance, ["x", "y"]);
@@ -110,7 +111,7 @@ function update_text_results(top_key,indicators,sel_tup){
     if (!sub.get("vals").get(sel_tup)){
         var group_rank_str = (n_populated_groups + 1) + "th";
         var percentile = 0;
-        $(".results").html("This selection has <b>" + 0 + "</b> people in it.<br>" + "Out of the " + n_groups + " theoretical groups (" + n_unpopulated_groups + " of which are unpopulated), this selection is tied for the <b>" + group_rank_str + "</b> most populated group; it's more populated than <b>" + percentile + "% of the groups.");
+        $(".results").html("This selection has <b>" + 0 + "</b> people in it.<br>" + "Out of the " + n_groups + " theoretical groups (" + n_unpopulated_groups + " of which are unpopulated), this selection is tied for the <b>" + group_rank_str + "</b> most populated group; it's more populated than <b>" + percentile + "%</b> of the groups.");
     }
     else {
         const n_people = format_big_number(sub.get("vals").get(sel_tup)[0]);
@@ -132,16 +133,17 @@ function update_text_results(top_key,indicators,sel_tup){
         }
         const percentile = Math.round((n_populated_groups-group_rank)/n_populated_groups *100,2);
         if (n_populated_groups<n_groups){
-            $(".results").html("This selection has <b>" + n_people + "</b> people in it.<br>" + "Out of the " + n_groups + " theoretical groups (" + n_unpopulated_groups + " of which are unpopulated), this selection is the <b>" + group_rank_str + "</b> most populated group; it's more populated than <b>" + percentile + "% of the groups.");
+            $(".results").html("This selection has <b>" + n_people + "</b> people in it.<br>" + "Out of the " + n_groups + " theoretical groups (" + n_unpopulated_groups + " of which are unpopulated), this selection is the <b>" + group_rank_str + "</b> most populated group; it's more populated than <b>" + percentile + "%</b> of the groups.");
         }
         else{
-            $(".results").html("This selection has <b>" + n_people + "</b> people in it.<br>" + "Out of the " + n_groups + " groups, this selection is the <b>" + group_rank_str + "</b> most populated group; it's more populated than <b>" + percentile + "% of the groups.");
+            $(".results").html("This selection has <b>" + n_people + "</b> people in it.<br>" + "Out of the " + n_groups + " groups, this selection is the <b>" + group_rank_str + "</b> most populated group; it's more populated than <b>" + percentile + "%</b> of the groups.");
         }
     }
 };
 
 function draw_first_circle(){
     var svg = d3.select("svg");
+    svg.selectAll("circle.temp-circle").remove();
     svg.append("circle")
         .attr("class","temp-circle")
         .attr("cx", 150)
@@ -149,7 +151,8 @@ function draw_first_circle(){
         .attr("r", 140)
         .style("fill", "#6603fc");
     $(".results").html("No selection has been made yet so the circle represents all <b>" + format_big_number((($("#include_genz").prop("checked")) ? n : n_without)) + "</b> people in the dataset.");
-    svg.append("svg:defs").append("svg:marker")
+    if (!($("#triangle").length)){
+        svg.append("svg:defs").append("svg:marker")
         .attr("id", "triangle")
         .attr("refX", 6)
         .attr("refY", 6)
@@ -160,12 +163,22 @@ function draw_first_circle(){
         .append("path")
         .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
         .style("fill", "black");
+    }
+    
 };
 
 function put_clear_listeners(){
     $('button.clear').on('click',function(){
-        $("input[name="+ $(this).attr("for")+"]").prop("checked",false);
-        update_circles();
+        var changed = false;
+        $("input[name="+ $(this).attr("for")+"]").each(function(){
+            if ($(this).prop("checked")){
+                changed = true;
+            }
+        });
+        if (changed){
+            $("input[name="+ $(this).attr("for")+"]").prop("checked",false);
+            update_circles();
+        }
     });
 };
 
