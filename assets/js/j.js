@@ -203,7 +203,7 @@ function put_genz_listeners(){
 };
 
 function get_path(x,y,radius){
-    const slack = 6;
+    const slack = 7;
     var x = 150+x;
     var y = 150+y;
     var dxs = Math.pow(150-x,2);
