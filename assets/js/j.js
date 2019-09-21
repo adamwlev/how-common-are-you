@@ -5,9 +5,9 @@ const n_without = 238771628;
 const max_attempts = 5000;
 const overall_max_attempts = 35;
 const k = 6;
-const n_big_ones = 1;
+const n_big_ones = 6;
 const pct_w_big_ones = .8;
-const buffer = 1.35;
+const buffer = 1.38;
 
 const cats = ["age_cat","race_cat","sex_cat","mar_cat",
               "edu_cat","nei_cat","income_cat","fempl_cat"];
@@ -62,7 +62,7 @@ function draw_circles(top_key,indicators,sel_tup){
                 if ((circles.length>n_big_ones) && (circles.length>n_w_big_ones)) {
                     points_to_try.push.apply(points_to_try, circles.slice(0,n_big_ones));
                 }
-                if (!overlaps(points_to_try,[x,y,radius],((sub.get("n_populated_groups") > 100) ? buffer : buffer + 4))){
+                if (!overlaps(points_to_try,[x,y,radius],((sub.get("n_populated_groups") > 60) ? buffer : buffer + 3))){
                     tree.insert({"x":x,"y":y});
                     center_to_radius[[x,y]] = radius;
                     circles.push([x,y,radius]);
@@ -72,7 +72,8 @@ function draw_circles(top_key,indicators,sel_tup){
                        .attr("cy", 150+y)
                        .attr("r", radius)
                        .style("fill",((is_purple) ? "#6603fc" : "#f77284"))
-                       //.style("stroke", ((is_purple) ? "none" : "red"));
+                       .style("opacity",((is_purple) ? 1.0 : .5))
+                       .style("stroke", ((is_purple) ? "none" : "#8f045a"));
                     if ((is_purple) && (radius<1.5)){
                         svg.append('path')
                             .style("fill","none")

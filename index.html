@@ -16,7 +16,7 @@
             <b>What is this?</b><br>
             It's a visualization of US census data!<br>
             <b>Why should I care?</b><br>
-            It might be fun to play around with. Admittedly it will be more interesting if you live in the US. You could find out<br>
+            It might be fun to play around with. Admittedly it will be more interesting if you live in the US. You could find out:<br>
             <ul>
                 <li>How common you are. In other words, how many people share your characteristics</li>
                 <li>How common you would be if you were slightly different</li>
@@ -25,7 +25,7 @@
             <b>How does it work?</b><br>
             Just click on the characteristics in the form below and the visualization and statistical result will automatically update<br>
             <b>What was this inspired by?</b><br>
-            This was inspired by an episode of NPR's Planet Money called <a href="https://www.npr.org/2019/08/28/755191639/episode-936-the-modal-american">"The Modal American"</a>. In fact it uses almost the same data and methodology as they describe in their write up.<br>
+            This was inspired by an episode of NPR's Planet Money called <a href="https://www.npr.org/2019/08/28/755191639/episode-936-the-modal-american">"The Modal American"</a>. In fact it uses almost the same data and methodology as they describe in their write up<br>
             <b>Show me the gory data details!</b><br>
             A writeup with all the gory details is coming. For now, <a href="https://www2.census.gov/programs-surveys/acs/data/pums/2017/1-Year/">here's a link</a> if you'd like to get the data yourself
         </div>
@@ -188,9 +188,18 @@
         </div>
         <br>
     </main>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-148376161-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-148376161-1');
+    </script>
+
     <script src="/assets/js/jquery.min.js"></script>
     <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="/assets/js/d3.js"></script>
     <script src="/assets/js/kdtree.js"></script>
     <script src="/assets/js/d.js"></script>
     <script src="/assets/js/j.js"></script>
