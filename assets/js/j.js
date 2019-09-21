@@ -73,7 +73,8 @@ function draw_circles(top_key,indicators,sel_tup){
                        .attr("r", radius)
                        .style("fill",((is_purple) ? "#6603fc" : "#f77284"))
                        .style("opacity",((is_purple) ? 1.0 : .5))
-                       .style("stroke", ((is_purple) ? "none" : "#8f045a"));
+                       .style("stroke", ((is_purple) ? "#6603fc" : "#8f045a"))
+                       .style("stroke-width",.8);
                     if ((is_purple) && (radius<1.5)){
                         svg.append('path')
                             .style("fill","none")
@@ -150,7 +151,9 @@ function draw_first_circle(){
         .attr("cx", 150)
         .attr("cy", 150)
         .attr("r", 140)
-        .style("fill", "#6603fc");
+        .style("fill", "#6603fc")
+        .style("stroke-width",.8)
+        .style("stroke","#6603fc");
     $(".results").html("No selection has been made yet so the circle represents all <b>" + format_big_number((($("#include_genz").prop("checked")) ? n : n_without)) + "</b> people in the dataset.");
     if (!($("#triangle").length)){
         svg.append("svg:defs").append("svg:marker")
